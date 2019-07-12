@@ -10,7 +10,6 @@
   - [MongoDB](#MongoDB)
   - [Mongoose](#Mongoose)
     - [Mongoose Schema](#Mongoose-Schema)
-- [<<<<<<< HEAD](#HEAD)
     - [Import Data](#Import-Data)
     - [Aside - Status Codes](#Aside---Status-Codes)
   - [Front End](#Front-End)
@@ -270,10 +269,7 @@ Mongoose uses [schemas](https://mongoosejs.com/docs/guide.html#definition) to de
 Create an instance of a Mongoose schema, RecipeSchema:
 
 Add to `server.js`: 
-<<<<<<< HEAD
-=======
 
->>>>>>> a830b52781a64763f6f424b9bb04d3c72e609e98
 ```js
 const RecipeSchema = new mongoose.Schema({
   title: String,
