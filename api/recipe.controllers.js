@@ -20,9 +20,10 @@ exports.add = function(req, res) {
 exports.update = function() {};
 
 exports.delete = function(req, res) {
+  console.log(req.body)
   let id = req.params.id;
-  Recipe.remove({ _id: id }, result => {
-    return res.send(result);
+  Recipe.deleteOne({ _id: id }, result => {
+    return res.sendStatus(200);
   });
 };
 

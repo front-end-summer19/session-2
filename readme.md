@@ -22,7 +22,7 @@
   - [Mongoose Model.create](#mongoose-modelcreate)
   - [Mongoose Model.DeleteMany()](#mongoose-modeldeletemany)
   - [Mongoose Model.create](#mongoose-modelcreate-1)
-    - [Demo: Posting via Postman](#demo-posting-via-postman)
+    - [Demo: Get via Postman](#demo-get-via-postman)
   - [Mongoose Model.remove](#mongoose-modelremove)
   - [Deleting on the Front End](#deleting-on-the-front-end)
   - [Find by ID](#find-by-id)
@@ -743,7 +743,7 @@ The HTML form element has an attribute named enctype, if not specified, its valu
 
 Test the form using the information from Pho.
 
-### Demo: Posting via Postman
+### Demo: Get via Postman
 
 Since modeling endpoints is a common task and few enjoy using curl (more on curl in a moment), most people use a utility such as [Postman](https://www.getpostman.com/).
 
@@ -884,7 +884,7 @@ const renderStories = recipes => {
 };
 ```
 
-Note the `location.reload();`
+Note the `location.reload();` and the console.
 
 Instead on one button, many:
 

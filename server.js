@@ -1,13 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const recipeModel = require('./api/recipe.model');
 const recipeControllers = require('./api/recipe.controllers');
 const app = express();
 
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ extended: false }));
 
 const dataBaseURL =
   'mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority';
