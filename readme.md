@@ -1084,7 +1084,7 @@ const detail = () => {
       <a href="/">Back</a>
       `;
     document.querySelector('#root').append(recipeEl);
-  // NEW
+    // NEW
     const editForm = document.querySelector('form');
     editForm.title.value = recipe.title;
     editForm.image.value = recipe.image;
@@ -1104,7 +1104,7 @@ app.use(express.urlencoded({ extended: false }));
 
 Test using Fetch with static content and an options object.
 
-Be sure to replace the hard coded id (`api/recipes/5d222a54334b1112c44a6066`) with the one in the browser location bar. 
+Be sure to replace the hard coded id (`api/recipes/5d222a54334b1112c44a6066`) with the one in the browser location bar.
 
 Note: this script needs to be outside the `detail()` scope for now:
 
