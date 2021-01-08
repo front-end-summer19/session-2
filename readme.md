@@ -486,11 +486,11 @@ app.use(express.static('public'));
 
 ## Using CommonJS
 
-Before we get any further we are going to use CommonJS to organize our code.
+Before we get any further we are going to organize our code a bit.Because we are in node-land we'll use CommonJS require statements.
 
 ### Controllers
 
-Create a new folder `api` and a file inside called `recipe.controllers.js`. We'll export each handler and create the functions in this file one by one. They are just empty functions for the moment.
+Create a new folder `api` and a file inside called `recipe.controllers.js`. We'll export each handler and create the functions in this file one by one. They will be empty functions for the moment.
 
 Add the following to `recipe.controllers.js`:
 
@@ -505,7 +505,7 @@ exports.update = function () {};
 exports.delete = function () {};
 ```
 
-The CommonJS `exports` allows the functions to be available for import elsewhere in our application.
+CommonJS `exports` nake the functions available for import elsewhere in our application.
 
 Update `server.js` to require our controllers:
 
@@ -523,6 +523,7 @@ app.get('/api/recipes/:id', recipeControllers.findById);
 app.post('/api/recipes', recipeControllers.add);
 app.put('/api/recipes/:id', recipeControllers.update);
 app.delete('/api/recipes/:id', recipeControllers.delete);
+app.get('/api/import', recipeControllers.import);
 ```
 
 Each route consists of three parts:
@@ -535,18 +536,13 @@ We've modeled our URL routes off of REST API conventions, and named our handling
 
 Delete the find route from server.js.
 
-Update findAll's definition in `recipe.controllers.js` to send a json snippet:
+Update findAll's definition in `recipe.controllers.js` to:
 
 ```js
 exports.findAll = function (req, res) {
-  res.send([
-    {
-      title: 'Lasagna',
-      description:
-        'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
-      image: 'lasagna.png',
-    },
-  ]);
+  Recipe.find({}, function (err, results) {
+    return res.send(results);
+  });
 };
 ```
 
@@ -570,7 +566,9 @@ const RecipeSchema = new Schema({
   image: String,
 });
 
-module.exports = mongoose.model('Recipe', RecipeSchema);
+const recipeModel = mongoose.model('Recipe', RecipeSchema);
+
+module.exports = recipeModel;
 ```
 
 We require mongoose and create and export an instance of a mongoose Schema to make sure we're getting and setting well-formed data to and from the Mongo collection.
@@ -584,27 +582,9 @@ const recipeModel = require('./api/recipe.model');
 const recipeControllers = require('./api/recipe.controllers');
 ```
 
-Update the `findAll()` function in `recipe.controllers` to query Mongo with the `find()` method.
-
-```js
-const mongoose = require('mongoose');
-const Recipe = mongoose.model('Recipe');
-
-exports.findAll = function (req, res) {
-  Recipe.find({}, function (err, results) {
-    return res.send(results);
-  });
-};
-
-exports.findById = function () {};
-exports.add = function () {};
-exports.update = function () {};
-exports.delete = function () {};
-```
-
 Note that we need to reference the Mongoose schema `const Recipe = mongoose.model('Recipe')` as we are using it in `Recipe.find`.
 
-Refactor to use arrow functions if desired:
+Refactor the exported findAll function to allow error checking and use arrow functions:
 
 ```js
 exports.findAll = (req, res) => {
@@ -617,26 +597,15 @@ exports.findAll = (req, res) => {
 
 `Model.find()` is a [Mongoose query](https://mongoosejs.com/docs/queries.html) that takes an object and an optional callback function. Passing `find({})` with an empty object means we are not filtering and so to return all of it.
 
-Once Mongoose looks up the data and returns a result set, we use `res.send()` to return the raw results.
+Once Mongoose looks up the data and returns a result set, we use `res.send()` to return the resulting json.
 
-Check that the server is still running and then visit the API endpoint for all recipes [localhost:3000/api/recipes](localhost:3000/api/recipes). You'll get JSON data back from the database - possibly an empty array `[]`.
+Check that the server is still running and then visit the API endpoint for all recipes [localhost:3000/api/recipes](localhost:3000/api/recipes). You'll get JSON data back from the database.
 
 ## Mongoose Model.create
 
-We will again use the Mongoose method `Model.create` to import data into our application.
+We will again enable the Mongoose method `Model.create` to import data into our application.
 
-Add a new api route - `app.get('/api/import', recipeControllers.import);` - to our list in `server.js`:
-
-```js
-app.get('/api/recipes', recipeControllers.findAll);
-app.get('/api/recipes/:id', recipeControllers.findById);
-app.post('/api/recipes', recipeControllers.add);
-app.put('/api/recipes/:id', recipeControllers.update);
-app.delete('/api/recipes/:id', recipeControllers.delete);
-app.get('/api/import', recipeControllers.import);
-```
-
-Delete the import route in server.js and define it in `recipe.controllers.js`:
+Delete the import route in `server.js` and re-define it in `recipe.controllers.js`:
 
 ```js
 exports.import = function (req, res) {
@@ -714,7 +683,7 @@ Change the filter `{ title: 'Lasagna' }` to `{}` to remove them all and run the 
 
 ## Mongoose Model.create
 
-We used `create()` in our import function in order to add multiple documents to our Recipes collection. Our POST handler uses the same method to add a single Recipe to the collection. Once added, the response is the full new Recipe's JSON object.
+We used `create()` in our import function in order to add multiple documents to our Recipes collection. Our POST handler uses the same method to add a single Recipe to the collection. Once added, the response is the new Recipe's JSON object.
 
 Edit `recipe-controllers.js`:
 
@@ -730,10 +699,37 @@ exports.add = function (req, res) {
 Add a form to index.html:
 
 ```html
-<form action="/api/recipes" method="POST">
-  <input type="text" placeholder="Recipe Title" name="title" />
-  <input type="text" placeholder="Image" name="image" />
-  <textarea type="text" placeholder="Description" name="description"></textarea>
+<form action="/api/recipes" method="post">
+  <label for="name"
+    >Name (id = name)
+    <input
+      type="text"
+      name="title"
+      value="testing 123"
+      id="name"
+      placeholder="Recipe Name"
+    />
+  </label>
+  <label for="image">
+    Image (id = image)
+    <input
+      type="text"
+      placeholder="Image"
+      name="image"
+      value="test"
+      id="image"
+    />
+  </label>
+  <label for="description">
+    Description (id = description)
+    <textarea
+      type="text"
+      name="description"
+      value="test"
+      id="description"
+      placeholder="Description"
+    ></textarea>
+  </label>
   <button type="submit">Submit</button>
 </form>
 ```
@@ -750,6 +746,7 @@ textarea {
   margin: 1rem;
   width: 90%;
   padding: 0.5rem;
+  font-family: inherit;
 }
 button {
   color: #fff;
@@ -770,7 +767,7 @@ Add to server.js with options:
 app.use(express.urlencoded({ extended: false }));
 ```
 
-The HTML form element has an attribute named enctype, if not specified, its value defaults to "application/x-www-form-urlencoded" (URL encoded form). The express.urlencoded middleware can handle URL encoded forms only.
+The HTML form element has an attribute named enctype, if not specified, its value defaults to "application/x-www-form-urlencoded" (URL encoded form). The `express.urlencoded` middleware can handle URL encoded forms only.
 
 Test the form using the information from Pho.
 
@@ -827,6 +824,7 @@ Force the page to refresh using `res.redirect('/');`:
 exports.add = function (req, res) {
   Recipe.create(req.body, function (err, recipe) {
     if (err) return console.log(err);
+    // return res.send(recipe);
     res.redirect('/');
   });
 };
@@ -856,7 +854,7 @@ It probably doesn't make much sense to send the results back from a delete funct
 ```js
 exports.delete = function (req, res) {
   let id = req.params.id;
-  Recipe.remove({ _id: id }, (result) => {
+  Recipe.remove({ _id: id }, (res) => {
     res.redirect('/');
   });
 };
@@ -885,7 +883,7 @@ const deleteBtns = document.querySelectorAll('.del');
 console.log(deleteBtns);
 ```
 
-Make sure this code is inside the renderStories function. Why? (Ans: because the delete buttons don't exist until the recipeEls have been appended.):
+Make sure this code is inside the renderStories function. Note: the delete buttons don't exist until the recipeEls have been appended, so they are selected after the creation of the recipeELs:
 
 ```js
 const renderStories = (recipes) => {
@@ -900,7 +898,7 @@ const renderStories = (recipes) => {
     document.querySelector('#root').append(recipeEl);
   });
   const deleteBtns = document.querySelectorAll('.del');
-  console.log(deleteBtns[0].dataset.id);
+  console.log('here ', deleteBtns[0].dataset.id);
 };
 ```
 
@@ -926,13 +924,15 @@ const renderStories = (recipes) => {
   });
 
   const deleteBtns = document.querySelectorAll('.del');
-
+  // here
+  // Note: this should use event delegation - see below
   deleteBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       fetch(`api/recipes/${btn.dataset.id}`, {
         method: 'DELETE',
       });
       e.preventDefault();
+      // wtf - not reactive
       location.reload();
     });
   });

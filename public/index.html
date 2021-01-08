@@ -3,31 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
     <title>Recipes!</title>
   </head>
   <body>
     <div id="root">
       <h1>Recipes!</h1>
+      <form action="/api/recipes" method="post">
+        <label for="name"
+          >Name
+          <input type="text" name="title" id="name" />
+        </label>
+        <label for="image">
+          Image
+          <input type="text" name="image" id="image" />
+        </label>
+        <label for="description">
+          Description
+          <textarea type="text" name="description" id="description"></textarea>
+        </label>
+        <button type="submit">Submit</button>
+      </form>
     </div>
 
+    <div id="app"></div>
+
     <script>
-      fetch(`api/recipes`)
-        .then((response) => response.json())
-        .then((recipes) => renderStories(recipes));
+      const getData = () => {
+        fetch(`api/recipes`)
+          .then((response) => response.json())
+          .then((recipes) => renderStories(recipes))
+          .catch((error) => console.error(error));
+      };
 
       const renderStories = (recipes) => {
-        console.log(recipes);
-        recipes.forEach((recipe) => {
-          recipeEl = document.createElement('div');
-          recipeEl.innerHTML = `
-            <img src="img/${recipe.image}" />
-            <h3>${recipe.title}</h3>
-            <p>${recipe.description}</p>
-          `;
-          document.querySelector('#root').append(recipeEl);
-        });
+        const el = document.querySelector('#app');
+        el.innerHTML = recipes
+          .map((recipe) => {
+            return `<div>
+              <img src="img/${recipe.image}" />
+              <h3><a href="detail.html?recipe=${recipe._id}">${recipe.title}</a></h3>
+              <p>${recipe.description}</p>
+              <a data-id=${recipe._id} href="#">Delete</a>
+            </div>`;
+          })
+          .join('');
       };
+
+      const handleClicks = () => {
+        if (event.target.matches('[data-id]')) {
+          fetch(`api/recipes/${event.target.dataset.id}`, {
+            method: 'DELETE',
+          });
+          event.preventDefault();
+          location.reload();
+        }
+      };
+
+      document.addEventListener('click', handleClicks);
+
+      if (document.readyState !== 'loading') {
+        getData();
+      } else {
+        document.addEventListener('DOMContentLoaded', getData());
+      }
     </script>
   </body>
 </html>

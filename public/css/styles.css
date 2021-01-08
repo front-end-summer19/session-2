@@ -14,3 +14,19 @@ div {
 img {
   max-width: 200px;
 }
+input,
+textarea {
+  font-size: 1rem;
+  display: block;
+  margin: 1rem;
+  width: 90%;
+  padding: 0.5rem;
+  font-family: inherit;
+}
+button {
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin: 0 1rem;
+  background: #007eb6;
+}
