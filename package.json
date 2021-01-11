@@ -20,6 +20,7 @@
   "homepage": "https://github.com/front-end-intermediate/ExpressJS#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
     "mongoose": "^5.11.10"
   },
   "devDependencies": {

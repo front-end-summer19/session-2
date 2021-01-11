@@ -34,10 +34,9 @@ exports.update = (req, res) => {
 };
 
 exports.delete = function (req, res) {
-  let id = req.params.id;
-  Recipe.deleteOne({ _id: id }, (res) => {
-    res.redirect('/');
-    // return res.sendStatus(202);
+  Recipe.findOneAndDelete({ _id: req.params.id }, function (err) {
+    if (err) console.log(err);
+    res.sendStatus(202);
   });
 };
 
@@ -81,4 +80,19 @@ exports.import = function (req, res) {
       return res.sendStatus(202);
     },
   );
+};
+
+exports.upload = function (req, res) {
+  console.log(req.files);
+  if (Object.keys(req.files).length == 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+  let file = req.files.file;
+  file.mv(`./public/img/${req.body.filename}`, (err) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    // res.json({ file: `public/img/${req.body.filename}` });
+    return res.sendStatus(200);
+  });
 };

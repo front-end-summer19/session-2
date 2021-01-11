@@ -2,6 +2,8 @@
 
 v 1.1
 
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs
+
 - [Server Side with ExpressJS](#server-side-with-expressjs)
   - [Homework](#homework)
   - [Resources](#resources)
@@ -843,6 +845,17 @@ exports.delete = function (req, res) {
 };
 ```
 
+Better:
+
+```js
+exports.delete = function (req, res) {
+  Recipe.findOneAndDelete({ _id: req.params.id }, function (err) {
+    if (err) console.log(err);
+    res.sendStatus(202);
+  });
+};
+```
+
 Check it out with curl (replacing the id at the end of the URL with a _known id_ from the GET (`api/recipes`) endpoint):
 
 ```sh
@@ -1301,7 +1314,11 @@ Upload an image (reuse one of the images in `/public/img/`) and give it a unique
 
 Go to the home page and create a recipe that uses the new image.
 
-Once successful, set the return value in the corresponding controller's function to `return res.sendStatus(200);`.
+Once successful, set the return value in the corresponding controller's function to
+
+```js
+return res.sendStatus(200);
+```
 
 ## Update the Recipe Model
 
